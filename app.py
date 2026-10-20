@@ -23,16 +23,20 @@ PAGE = """<!doctype html>
     .tag{color:#155eef;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem}
     h1{margin:.6rem 0;font-size:2.2rem}p{color:#526173}.task{display:flex;justify-content:space-between;
       gap:1rem;padding:1rem 0;border-top:1px solid #e7ecf3}.status{font-size:.86rem;color:#155eef}
+    .summary{margin:0 0 1rem;font-weight:600;color:#344054}
     footer{margin-top:1.5rem;font-size:.85rem;color:#667085}
   </style>
 </head>
 <body><main class="card"><div class="tag">Student project · CI/CD demo</div>
   <h1>Campus Task Board</h1><p>A small project deployed automatically with Jenkins, Docker and Kubernetes.</p>
+  <p id="summary" class="summary" aria-live="polite"></p>
   <section id="tasks" aria-live="polite">Loading tasks…</section><footer id="version"></footer>
   <script>
     fetch('/api/tasks').then(r=>r.json()).then(data=>{
       document.querySelector('#tasks').innerHTML=data.tasks.map(t=>
         `<div class="task"><strong>${t.title}</strong><span class="status">${t.status}</span></div>`).join('');
+      document.querySelector('#summary').textContent=
+        `${data.summary.total} tasks · ${data.summary.in_progress} in progress · ${data.summary.to_do} to do · ${data.summary.done} done`;
       document.querySelector('#version').textContent=`Application version ${data.version}`;
     }).catch(()=>document.querySelector('#tasks').textContent='Could not load tasks.');
   </script>
@@ -44,7 +48,11 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/health":
             self._send(200, "ok", "text/plain; charset=utf-8")
         elif self.path == "/api/tasks":
-            body = json.dumps({"version": app_version(), "tasks": TASKS})
+            body = json.dumps({
+                "version": app_version(),
+                "tasks": TASKS,
+                "summary": summarize_tasks(TASKS),
+            })
             self._send(200, body, "application/json; charset=utf-8")
         elif self.path == "/":
             self._send(200, PAGE, "text/html; charset=utf-8")
@@ -74,6 +82,16 @@ def main():
 def app_version():
     """Return the configured display version, defaulting to the starter version."""
     return os.environ.get("APP_VERSION", "1.0.0")
+
+
+def summarize_tasks(tasks):
+    """Return counts for the task board's supported statuses."""
+    return {
+        "total": len(tasks),
+        "in_progress": sum(task["status"] == "In progress" for task in tasks),
+        "to_do": sum(task["status"] == "To do" for task in tasks),
+        "done": sum(task["status"] == "Done" for task in tasks),
+    }
 
 
 def configured_port():

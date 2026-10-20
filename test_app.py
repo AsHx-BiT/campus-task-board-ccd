@@ -41,6 +41,16 @@ class AppTest(unittest.TestCase):
         self.assertEqual(data["version"], "1.0.0")
         self.assertGreaterEqual(len(data["tasks"]), 1)
 
+    def test_tasks_api_includes_status_summary(self):
+        with urlopen(self.base + "/api/tasks") as response:
+            data = json.load(response)
+        self.assertEqual(data["summary"], {
+            "total": 3,
+            "in_progress": 1,
+            "to_do": 1,
+            "done": 1,
+        })
+
     def test_tasks_api_uses_configured_version(self):
         with patch.dict(os.environ, {"APP_VERSION": "build-42"}):
             with urlopen(self.base + "/api/tasks") as response:
