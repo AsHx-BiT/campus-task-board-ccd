@@ -106,14 +106,14 @@ path = Path(sys.argv[1])
 text = path.read_text(encoding="utf-8")
 
 text, repo_count = re.subn(
-    r"(?m)^(\\s*newName:\\s*).+$",
+    r"(?m)^(\s*newName:\s*).+$",
     lambda match: match.group(1) + os.environ["IMAGE_REPO"],
     text,
     count=1,
 )
 
 text, tag_count = re.subn(
-    r"(?m)^(\\s*newTag:\\s*).+$",
+    r"(?m)^(\s*newTag:\s*).+$",
     lambda match: match.group(1) + '"' + os.environ["IMAGE_TAG"] + '"',
     text,
     count=1,
@@ -123,7 +123,7 @@ deployment_path = path.parent / "deployment.yaml"
 deployment_text = deployment_path.read_text(encoding="utf-8")
 
 deployment_text, version_count = re.subn(
-    r"(?m)^(\\s*value:\\s*).+$",
+    r"(?m)^(\s*value:\s*).+$",
     lambda match: match.group(1) + '"' + os.environ["IMAGE_TAG"] + '"',
     deployment_text,
     count=1,
