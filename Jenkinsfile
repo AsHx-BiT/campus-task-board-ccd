@@ -11,7 +11,7 @@ pipeline {
             steps {
                 checkout scm
                 script {
-                    def imageRepo = env.IMAGE_REPO?.trim()
+                    def imageRepo = env.IMAGE_REPO?.trim() ?: 'docker.io/ashrey24/campus-task-board'
                     if (!imageRepo ||
                         !imageRepo.startsWith('docker.io/') ||
                         imageRepo.contains(':') ||
