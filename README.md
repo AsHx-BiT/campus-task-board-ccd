@@ -1,6 +1,6 @@
 # Campus Task Board - CCA 2 CI/CD project
 
-A small, dependency-free student task board used to demonstrate the required Jenkins, Docker Hub, and Minikube pipeline. It serves a web page, a JSON tasks endpoint, and a health endpoint. The container runs as a non-root user.
+A small, dependency-free student task board used to demonstrate the required Jenkins, Docker Hub, and Minikube pipeline. It serves a web page where you can add a task and choose its status, a JSON tasks endpoint, and a health endpoint. Added tasks remain in memory until the app process restarts. The container runs as a non-root user.
 
 > **Assignment requirement:** the guide says to use an existing academic project. This workspace did not contain one, so this is a ready-to-run demonstration project, not evidence of a project you built earlier. To meet that requirement, use this pipeline structure with your own earlier academic project's source code, or confirm that your instructor accepts a new demo project.
 
@@ -20,7 +20,7 @@ python3 -m unittest -v
 python3 app.py
 ```
 
-Open `http://localhost:8080`. The API is at `/api/tasks`; `/health` returns `ok`.
+Open `http://localhost:8080`, enter a task name, choose `To do`, `In progress`, or `Done`, and select **Add task**. The board and status counts update immediately. The API is at `/api/tasks`; send a JSON `POST` to add a task, and `/health` returns `ok`.
 The server binds to `0.0.0.0` for container access. Set `PORT` to choose its listening port and `APP_VERSION` to change the version shown by the API and page. The app has no database or secret configuration.
 
 Build and run the container:
